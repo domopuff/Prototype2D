@@ -1,0 +1,411 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LevelGenerator : MonoBehaviour {
+    enum gridSpace { empty, floor, wall, shadow }; 
+    gridSpace[,] grid;
+    int roomHeight, roomWidth;
+    Vector2 roomSizeWorldUnits = new Vector2(700, 700); 
+    float worldUnitsInOneGridCell = 16;
+    struct walker {
+
+        public Vector2 dir;
+        public Vector2 pos;
+    }
+    List<walker> walkers;
+    float chanceWalkerChangeDir = 0.7f, chanceWalkerSpawn = 0.05f;
+    float chanceWalkerDestoy = 0.6f; 
+    int maxWalkers = 5;
+    [Range(0f, 0.99f)]
+    public float percentToFill;
+
+    public GameObject wallObj, wall1Obj, wall2Obj, wallShadow, floorObj, gravelObj, portalObj, cactusProp, windProp, rockProp, chestProp, player;
+
+
+    [Header("Enemy")]
+    public GameObject[] enemy;
+    [Range(0f, 0.99f)]
+    public float enemySpawnPercentage;
+
+    [Header("Environment Editor")]
+    [Range(0f, 0.2f)]
+    public float wall1SpawnRate;
+    [Range(0f, 0.2f)]
+    public float wall2SpawnRate;
+    [Range(0f, 0.5f)]
+    public float gravelSpawnRate;
+    [Range(0f, 0.2f)]
+    public float cactusSpawnRate;
+    [Range(0f, 0.2f)]
+    public float windSpawnRate;
+    [Range(0f, 0.2f)]
+    public float rockSpawnRate;
+    [Range (0,10)]
+    public int numberOfChest;
+    int chestCount = 0;
+
+
+    void Start() {
+        Setup();
+        CreateFloors();
+        CreateWalls();
+        RemoveSingleWalls();
+        SpawnLevel();
+        SpawnEnemy();
+        SpawnPlayer();
+        SpawnPortal();
+
+
+    }
+    void Setup() {
+        //find grid size
+        roomHeight = Mathf.RoundToInt(roomSizeWorldUnits.x / worldUnitsInOneGridCell);
+        roomWidth = Mathf.RoundToInt(roomSizeWorldUnits.y / worldUnitsInOneGridCell);
+        //create grid
+        grid = new gridSpace[roomWidth, roomHeight];
+        //set grid's default state
+        for (int x = 0; x < roomWidth - 1; x++) {
+            for (int y = 0; y < roomHeight - 1; y++) {
+                //make every cell "empty"
+                grid[x, y] = gridSpace.empty;
+            }
+        }
+        //set first walker
+        //init list
+        walkers = new List<walker>();
+        //create a walker 
+        walker newWalker = new walker();
+        newWalker.dir = RandomDirection();
+        //find center of grid
+        Vector2 spawnPos = new Vector2(Mathf.RoundToInt(roomWidth / 2.0f), 
+                                        Mathf.RoundToInt(roomHeight / 2.0f)); 
+        newWalker.pos = spawnPos;
+        //add walker to list
+        walkers.Add(newWalker);
+
+    }
+
+
+
+
+    //Spawn Player
+    void SpawnPlayer()
+    {
+
+        //Loops through every grid space
+        for (int x = 0; x < roomWidth; x++) {
+            for (int y = 0; y < roomHeight; y++) {
+                 
+                bool spawnPlayer = false; 
+
+                //Checks if grid is floor or shadow, if it is, spawns player
+                if (grid[x, y] == gridSpace.floor && grid[x, y-1] == gridSpace.floor && grid[x-1, y] == gridSpace.floor) { 
+                    spawnPlayer = true;
+
+                    //Spawns the player 
+
+                    if (spawnPlayer) {
+                        Vector2 spawnPos = new Vector2(x, y) * worldUnitsInOneGridCell - roomSizeWorldUnits / 2.0f;
+                        player.transform.position = spawnPos;
+                    }
+                }
+            }
+        }
+    }
+
+    void SpawnEnemy()
+    {
+
+        //Loops through every grid space
+        for (int xPos = 0; xPos < roomWidth; xPos++)
+        {
+            for (int yPos = 0; yPos < roomHeight; yPos++)
+            { 
+                //Checks if grid is floor or shadow, if it is, spawns enemy
+                if (grid[xPos, yPos] == gridSpace.floor && grid[xPos, yPos-1] == gridSpace.floor)
+                {
+                    if (Random.value > (1-enemySpawnPercentage))
+                    {
+                        for (int i = 0; i < enemy.Length - 1; i++)
+                        {
+                            if (Random.value > (1 - enemySpawnPercentage))
+                            {
+                                int random = (int)Mathf.Floor(Random.Range(0, enemy.Length));
+                                Spawn(xPos, yPos, enemy[random]);
+                                
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void SpawnPortal()
+    {
+        int portalCount = 0;
+
+        //Loops through every grid space
+        for (int xPos = 0; xPos < roomWidth; xPos++)
+        {
+            for (int yPos = 0; yPos < roomHeight; yPos++)
+            {
+                if (portalCount < 1)
+                {
+                    //Checks if grid is floor or shadow, if it is, spawns enemy
+                    if (grid[xPos, yPos] == gridSpace.floor && grid[xPos, yPos - 1] == gridSpace.floor && grid[xPos + 1, yPos] == gridSpace.floor && grid[xPos + 1, yPos - 1] == gridSpace.floor)
+                    {
+                        Spawn(xPos, yPos, portalObj);
+                        portalCount++;
+                    }
+                }
+            }
+        }
+    }
+    
+
+    void CreateFloors(){
+		int iterations = 0;//loop will not run forever
+		do{
+            //create floor at position of every walker
+            foreach (walker myWalker in walkers)
+            {
+                grid[(int)myWalker.pos.x, (int)myWalker.pos.y] = gridSpace.floor;
+                grid[(int)myWalker.pos.x+1, (int)myWalker.pos.y+1] = gridSpace.floor;
+
+            }
+            //chance: destroy walker
+            int numberChecks = walkers.Count; //might modify count while in this loop
+			for (int i = 0; i < numberChecks; i++){
+                //only if its not the only one, and at a low chance  
+                if (Random.value < chanceWalkerDestoy && walkers.Count > 1) {
+                    walkers.RemoveAt(i);
+
+                    break; //only destroy one per iteration
+				}
+			}
+			//chance: walker pick new direction
+			for (int i = 0; i < walkers.Count; i++){
+				if (Random.value < chanceWalkerChangeDir){
+					walker thisWalker = walkers[i];
+					thisWalker.dir = RandomDirection();
+					walkers[i] = thisWalker;
+
+                }
+			}
+			//chance: spawn new walker
+			numberChecks = walkers.Count; //might modify count while in this loop
+			for (int i = 0; i < numberChecks; i++){
+				//only if # of walkers < max, and at a low chance
+				if (Random.value < chanceWalkerSpawn && walkers.Count < maxWalkers){
+					//create a walker 
+					walker newWalker = new walker();
+					newWalker.dir = RandomDirection();
+					newWalker.pos = walkers[i].pos;
+					walkers.Add(newWalker);
+
+                }
+            }
+			//move walkers
+			for (int i = 0; i < walkers.Count; i++){
+				walker thisWalker = walkers[i];
+				thisWalker.pos += thisWalker.dir;
+				walkers[i] = thisWalker;
+
+            }
+            //avoid boarder of grid
+            for (int i =0; i < walkers.Count; i++){
+				walker thisWalker = walkers[i];
+				//clamp x,y to leave a 1 space boarder: leave room for walls
+				thisWalker.pos.x = Mathf.Clamp(thisWalker.pos.x, 1, roomWidth-3);
+				thisWalker.pos.y = Mathf.Clamp(thisWalker.pos.y, 1, roomHeight-3);
+				walkers[i] = thisWalker;
+			}
+			//check to exit loop
+			if ((float)NumberOfFloors() / (float)grid.Length > percentToFill){
+				break;
+			}
+			iterations++;
+		}while(iterations < 100000);
+	}
+	void CreateWalls(){
+		//loop though every grid space
+		for (int x = 0; x < roomWidth-1; x++){
+			for (int y = 0; y < roomHeight-1; y++){
+				//if theres a floor, check the spaces around it
+				if (grid[x,y] == gridSpace.floor){
+                    //if any surrounding spaces are empty, place a wall
+                    if (grid[x,y+1] == gridSpace.empty){
+						grid[x,y+1] = gridSpace.wall;
+                    }
+                    if (grid[x, y - 1] == gridSpace.empty) { 
+                        grid[x, y - 1] = gridSpace.wall;
+                    }
+					if (grid[x+1,y] == gridSpace.empty){
+						grid[x+1,y] = gridSpace.wall;
+                    }
+					if (grid[x-1,y] == gridSpace.empty){
+						grid[x-1,y] = gridSpace.wall;
+                    }
+				}
+
+                //Checks if its a floor and a wall is above, if yes place shadow
+                if(grid[x,y] == gridSpace.floor && grid[x,y+1] == gridSpace.wall)
+                {
+                    grid[x, y] = gridSpace.shadow;
+                }
+		}
+		}
+	}
+	void RemoveSingleWalls(){
+		//loop though every grid space
+		for (int x = 0; x < roomWidth-1; x++){
+			for (int y = 0; y < roomHeight-1; y++){
+				//if theres a wall, check the spaces around it
+				if (grid[x,y] == gridSpace.wall){
+					//assume all space around wall are floors
+					bool allFloors = true;
+					//check each side to see if they are all floors
+					for (int checkX = -1; checkX <= 1 ; checkX++){
+						for (int checkY = -1; checkY <= 1; checkY++){
+							if (x + checkX < 0 || x + checkX > roomWidth - 1 || 
+								y + checkY < 0 || y + checkY > roomHeight - 1){
+								//skip checks that are out of range
+
+								continue;
+							}
+							if ((checkX != 0 && checkY != 0) || (checkX == 0 && checkY == 0)){
+								//skip corners and center
+								continue;
+							}
+							if (grid[x + checkX,y+checkY] != gridSpace.floor){
+								allFloors = false;
+
+                            }
+						}
+					}
+					if (allFloors){
+						grid[x,y] = gridSpace.floor;
+
+
+
+                    }
+                }
+			}
+		}
+	}
+    
+
+    //Environment Editor
+	void SpawnLevel(){
+		for (int x = 0; x < roomWidth; x++){
+			for (int y = 0; y < roomHeight; y++){
+				switch(grid[x,y]){
+					case gridSpace.empty:
+						break;
+					case gridSpace.floor:
+                        if(Random.value < (1-gravelSpawnRate))
+                        { 
+						Spawn(x,y,floorObj);
+                            if (Random.value < cactusSpawnRate)
+                            {
+                                Spawn(x, y, cactusProp);
+                            }
+                             
+                            if (Random.value < rockSpawnRate)
+                            {
+                                Spawn(x, y, rockProp);
+                            }
+
+                            if (Random.value < windSpawnRate)
+                            {
+                                Spawn(x, y, windProp);
+                            }
+
+                            if (Random.value < 0.02)
+                            {
+                                if (chestCount < numberOfChest)
+                                {
+                                    Spawn(x, y, chestProp);
+                                    chestCount++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Spawn(x, y, gravelObj); 
+                            Spawn(x, y+1, gravelObj);
+                            Spawn(x+1, y, gravelObj);
+
+                        }
+
+                        break;
+					case gridSpace.wall:
+                        //Spawns wall and Shadow Tilemap
+
+                        Spawn(x, y, wallObj);
+
+                        if (Random.value < wall1SpawnRate)
+                        { 
+                            Spawn(x, y, wall1Obj);
+                            
+                        }
+
+                        if (Random.value < wall2SpawnRate)
+                        {
+                            Spawn(x, y, wall2Obj);
+                        }
+
+
+
+
+
+                        break;
+                    case gridSpace.shadow:
+                        Spawn(x, y, wallShadow);
+                        Spawn(x, y, floorObj);
+
+                        break;
+				}
+			}
+		}
+	}
+
+    Vector2 RandomDirection(){
+		//pick random int between 0 and 3
+		int choice = Mathf.FloorToInt(Random.value * 3.99f);
+		//use that int to chose a direction
+		switch (choice){
+			case 0:
+				return Vector2.down;
+			case 1:
+				return Vector2.left;
+			case 2:
+				return Vector2.up;
+			default:
+				return Vector2.right;
+		}
+	}
+	int NumberOfFloors(){
+		int count = 0;
+		foreach (gridSpace space in grid){
+			if (space == gridSpace.floor){
+				count++;
+			}
+		}
+		return count;
+	}
+    void Spawn(float x, float y, GameObject player)
+    {
+        //find the position to spawn
+        Vector2 offset = roomSizeWorldUnits / 2.0f;
+        Vector2 spawnPos = new Vector2(x, y) * worldUnitsInOneGridCell - offset;
+        //spawn object
+        player.transform.position = spawnPos;
+        Instantiate(player, spawnPos, Quaternion.identity);
+       
+
+    }
+}
