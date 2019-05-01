@@ -1,0 +1,311 @@
+Feb 16
+
+Finalized character design and mood board
+Created weapon assets (pistol  and assaultrifle)
+Created projectile assets and muzzle flash
+Created player sprites (roll, idle, walk, death, take hit, fall)
+Created environment tilemaps for stage 1 (Sand, wall & gravel)
+Added Moostache Top down shooter pack
+
+
+Feb 23rd
+
+Finalized procgen technic from research selections
+Created procedural algorithm 
+Improved generated terrains; terrain contains a larger empty area with fewer passages which are considered hard to play
+Added collisions to wall 
+
+Feb 24th
+
+Random Enemy Spawn of Slime and Skeleton
+Spawn location spread throughout the map
+Added Shadows and enhanced aesthetics of environment
+Added Gravel tile
+Added Ammo Counter
+
+
+
+Feb 26th 
+Fixed placement of shadow in the map (checked for if its a floor && a wall is on top of it, then place shadow & floor tile underneath to allow for opacity)
+Fixed Player spawn (Checked for floor and wall and move player to location)
+
+Feb 27th 
+Fixed Enemy Spawn (Enemies now spawn properly and not in the wall - using the Spawn code)
+Fixed player colliding with walls (By changing box collider to edge collider)
+Added slider to control enemy spawning intensity (Difficulty mode)
+Added slider to control level size spawning algorithm
+Added animated environment sprites (cactus, cactus1 rocks, wind)
+
+Feb 28th
+Fixed scene restart
+Hit R key to restart scene
+Added destructible props (cactus)
+
+March 2nd
+Added more destructible props (rock)
+Fixed Ammo Count when switching weapons 
+(Originally it was done in the UI Canvas but the issue was that when the current weapon is destroyed, the script in the Canvas cannot pick up the weapon script anymore. Hence the solution was to incoporate the ammo count in the weapon script itself and get reference from the Ammo Counter script in the UI Canvas which is a better workaround.)
+Updated the font to align with font used in proposal  (Arcade Classic)
+Improved visuals for bullet firing animation by stretching the x (motion blur)
+Added chest spawn
+Fixed EnemyStaff affecting ammo count
+Changed enemySkeleton health from 4 to 2
+Changed enemySlime health from 4 to 1
+Fixed sorting layers of wall and props (player is above)
+
+March 3rd
+Fixed Player spawning and colliding with walls by checking for a free area space by using edge colliders 
+Added wall depth 
+Updated player running animation for a better feel
+Fixed sorting layers
+Increased enemy skeleton walk speed and random angle shooting
+Adjusted camera damp time from 0.05 to 0.1 for less quick motion 
+Screen Resolution capped at 4:3
+Splash Screen & Icon
+First Build
+Added SFX for weapons
+Added new Snake enemy
+Added enemySkeleton shooting SFX 
+Updated enemySkeleton projectile sprite
+
+
+March 4th
+Added HitSFX for weapons 
+Updated gravel spawning algorithm
+Added Portal Spawn 
+Testing of sliders
+Added pickup SFX (Attached AudioSource to weaponpickup and set to Play on Awake)
+Added text to weaponpickups 
+
+March 5th
+Updated interaction with chest. Player moves over chest and automatically opens instead of interacting and pressing e to open
+Updated Shotgun projectile bounce/FX and slow down 
+Added SFX for empty magazine
+Added SFX for chest
+Added ammo drops from mobs
+Updated UI text to TextMeshPro, better focus on text
+
+March 6th
+Fixed issue with Ammopickup SFX not playing due to it getting destroyed. Solution was to attach SFX to a global gameobject which stays in the game.
+Updated Enemy Projectile to bypass enemies
+Updated Ammo Count UI to when player pickups ammo
+Added sprite flasher to pickups
+Added health drops from enemyskeleton
+Added chance for enemies to drop weapons
+Build V3
+
+March 7th
+Fixed enemy going through walls by adding another box collider to the walls prefab
+Added player walking SFX
+Added player death SFX
+Added player hurt SFX
+Added Portal SFX
+Added new BGM, new Cyberpunk soundtracks from https://assetstore.unity.com/packages/audio/music/electronic/synthwave-001-cyberpunk-music-asset-pack-84025
+Updated Pixel Cam pixels per unit to 1.3 to enhance sense of space
+Added Chromatic Abberation Shudder
+http://www.shaderslab.com/demo-78---chromatic-aberration.html
+Updated portal spawn only when last enemy is left
+
+March 8th
+Fixed Portal spawn when all enemies are killed (Solution was to deactivate the portal prefab and to activate the portal instance only when all enemies are killed. The portal then takes the position of the last enemy and instantiates.)
+Fixed Portal sorting order
+
+
+March 9th
+Added Portal Sprites & Animation & SFX
+Added Particle System for Portal spawn
+Added New Stage (1 - 2) and portal loads new scene
+Added Main menu scene 
+Fixed Audio looping issue when respawning (Created an Audio Manager to activate and deactivate audio tracks throughout the game)
+Updated shader for better Portal visuals
+
+March 10th
+One whole fucking day to get Loading screen sorted out
+Added Loading screen
+Added SFX for UI
+Removed Start Button to facilitate "Player to explore and enter the portal - acts as a tutorial phase"
+Added Settings and Gameplay UI Page
+Build V4
+
+March 11th
+Updated pickups box colliders by increasing the size - to facilitate easier pickups
+Added Stage name on Loading Screen
+
+March 15th
+Added Enemy Boss Snake
+Added Chase, Death and Spit animations
+Added snake custom attack pattern
+Added Forest Stage 2-1
+
+
+March 16th
+Updated Portal delay when all enemies are killed
+Added Bandit enemy animations
+Incoporated BulletML Asset pack
+Added Pause Menu
+Updated UI button
+Added forest environment sprites
+Added BGM for forest stage
+Added bush prop - Bush has a chance of spawning an enemy Bandit
+Added Forest Stage 2-2
+
+March 17th
+Updated Desert Sprites for better contrast - Previously it was hard to tell between the walls and gravel
+Added Boss Bandit animations & Sprites
+Added States for Boss Bandit - Chase player and Shoot, Idle & Bush which spawns smaller enemy bandits. The issue with this set up is that due to the fact that the state names could not be read, I could not use the statemachine to execute commands. To bypass that, I checked for the animator bools and used it as rules to execute commands.
+Addded Boss Bandit attack pattern/projectile rate
+
+
+March 18th
+Fixed issue with Boss not spawning
+Updated Bandit walking speed from 4000 to 3000
+Added Bandit spawn SFX from Boss Bush state
+Build V6
+Player now has starting invincibility of 100 frames
+Added Godmode - R key
+
+March 20th
+Upgrade Menu UI added
+Added Upgrades for player walk speed and increased ammo pickup
+Build V7
+Fixed Retry button which restarts the game properly
+Fixed the issue of player getting stuck in the walls - Thanks to Alan advice, I centralized the Edge Collider's points and now when the player flips, the collider doesnt flip into the wall collider
+Added version log in Main Menu
+Added Portal Core to facilitate narrative storytelling
+Fixed drops from stacking on each other - Now it is spaced out randomly which avoids conflicting text overlays
+Added Level portal - Differentiate from the normal stage portal
+
+
+March 27th
+Added Level 3 - Urban
+Added sprites for level generation
+
+March 31st
+Added Lamp Props
+Disabled Pixel Art Camera for clearer visuals
+Added car prop which explodes and deals damage
+Added particle FX for car prop
+Added Yakuza Enemy
+
+April 1st
+Game Completed
+Added melee attack for Mafia
+Added Sniper Rifle
+Updated treasure chest to better spawn weapons - Added chance drops and randomization values
+Added Scene 3-2, 3-3, 3-4
+Improved shotgun spread - Shotgun now takes up 3 ammo instead of 5
+
+
+April 2nd
+Fixed issue where by car's explosion collider not fully deactivated - Ran an IEnumator for 0.1f to deactivate collider
+Updated bush prop to spawn near player proximity
+Added Cheat treasure chest by pressing "4"
+Fixed ammo UI giving errors 
+Fixed Player shooting once in loading screen
+Updated Player base speed from 80 - 90 & Increased map sizes (feels much exporable)
+Medkits now spawn only when the player health is not full
+Build V.0.8
+
+April 3rd
+Boss Cutscenes added - added a slight delay before playing the cutscene (not too sudden for player)wd
+Sniper Rilfe now has piercing shots and base ammo increased to 50 - To balance out slow reload times 
+Added line of sight for Sniper Rifle
+Added Big Dawg & Minigun Weapons
+Updated Portal core now spawns portal and destroys all enemies
+
+
+April 4th
+
+Mafia MafiaBoss Assets
+Added MafiaBoss Death, Melee, Alert, Idle & Death Sprites
+
+
+April 5th
+Added Mafia Boss States and animation - Entry - Idle (Randomizes between idle, alert and shooting states). Alert states transitions into chase state and if player is detected, it will spawn a meleee attack instantiate. Shooting state is set as 3f.
+Added Object Pooling - Current game has lag spikes due to immense instantiate count (bullets and enemies). Object pooling basically instantiates all of these instantiates at loading screen and then activates and deactivates the instantiates accordingly. 
+Added object pooling for pistol projectile , projectile FX,
+
+
+April 6th
+Added Object Pooling for shotgunProjectile, BigDawgProjectile , EnemySkeleton Projectile
+Added intialization state for Bosses - Instead of spawning straight away and chasing the player, there needs to be some lag time for the player and the boss fight
+Optimization of game assets
+Fixed Boss Activating (Intializing) after Boss cutscene has played
+Object Pooling for projectiles and FX
+Build V.0.9
+
+
+April 7th
+Added enemy distance spawning radius from player  - Otherwise it is unfair for the player to take damage - uses physics circle to check and destroy enemies 
+Fixed bullet casing collider so that it doesnt fly out of walls
+Fixed colliders for bandit - Moved it lower
+Added In Game Timer - https://www.youtube.com/watch?v=ixlIaMuhkbM
+Added Year Text in Loading Menu 
+Fixed ammo counter from showing negative values
+Added MafiaBoss Cutscene
+
+
+April 8th
+Stage 4-1 Assets - neon/cyberpunk setting
+Added Poison Gas Canisters
+Added Turret Enemy - idle, retract , extend & attack states - unable to use State_Exit() due to unity crashing. Switched to timer to transition from retract to idle and from extend to attack instead.
+
+April 10th
+Play test from friends - Feedback received
+Adjusted Car Size in Stage 3 as they made the level feel smaller due to the bigger sprite sizes. Claustrophobic
+Added Level Assets - laser and wall assets
+Removed Pistol from spawning in 3rd Area
+Reduced Clutter in 3rd Area - Reduce Car Spawns which makes it more playable when player first spawns
+Added Robot Enemy - Laser Sight
+
+
+April 11th
+Increased Bush Enemy Radius detection
+Disabled Level  Portal Spawn when all enemies are killed in Boss Stages - Player needs to defeat the boss which drops the portal core to open up the Level Portal
+Boss Stage Level - Non procedural
+Asset Creation for Final Boss - Assistant
+
+April 20th
+Added Assistant behaviours and narrative text
+Credits
+Build V1.0
+
+Todo:
+Animations for pickup UI text
+Fix ammo counter (Add ammo instead of replacing)
+Make loading screen load slower 
+Character skills upgrades
+Score system
+lower difficulty - different modes
+Weapon Swap
+-documentation - marking criteria
+Portal doesnt spawn because enemies are killed at the same time (by sniper rifle) - put in failsafe portal
+make Portal core art
+Stop Snake boss from shooting  during pause menu
+Object pool for enemy spawns and casing muzzle flash
+Colliders Acting Weird
+Destroy animation for shotgun projectile
+Add more enemy behaviour 
+portal sfx not playing (werid 3d glitch) - stage 2-1
+enable hitfx to play on when it hits the wall
+FIx ammo bug - - 1
+EndScreen Run Description
+Time (Year text) depletes - each time the player fires a gun, increments the time by a certain amount (time adds on) 
+When u take damage u lose time 
+Fix overlapping of boss sprites in walls
+fix drops spawning in walls
+a mode that allows continuation, just for those who arent super hardcore players, and this in turn disables Achievements or locks out some end-game content
+Sprite Flasher when player near weapon
+Add in SFX for assitant boss level
+
+Feedback
+
+- Might consider adding health bar
+
+Second stage abit meh
+- graphics and one more enemy-
+- Second stage is not as difficult
+- And transition to third stage can be too overwhelming
+- Increase bandit spawn boundary 
+- Bandit - give new state (charge up after spawn and charge towards enemy then go become normal behaviour) 
+- Add behaviour in case boss loses line of sight
